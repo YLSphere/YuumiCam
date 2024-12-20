@@ -11,8 +11,14 @@ bot = commands.Bot(command_prefix = '!', intents = discord.Intents.all())
 @bot.event
 async def on_ready():
     print("YuumiCam is online")
-    channel = bot.get_channel(config.CHANNEL_ID)
-    await channel.send('YuumiCam is online! Use !help for commands')
+    for guild in bot.guilds:
+        # Find a text channel by name (replace 'general' with your channel's name)
+        channel = discord.utils.get(guild.text_channels, name='general')  
+        
+        # If the channel is found, send the message
+        if channel:
+            await channel.send("Bot is now online and ready!")
+            break
     
 @bot.command()
 async def ping(ctx):

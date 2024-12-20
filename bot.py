@@ -46,40 +46,42 @@ async def send_help_message(channel):
         )
     
 async def create_and_send_gif(channel):
-    await channel.send("Downloading cat...")
-    cap = cv2.VideoCapture(0)  # Open the webcam
-    print(cap)
-    if not cap.isOpened():
-        await channel.send("Could not access the webcam.")
-        return
+    try:
+        await channel.send("Downloading cat...")
+        cap = cv2.VideoCapture(0)  # Open the webcam
+        if not cap.isOpened():
+            await channel.send("Could not access the webcam.")
+            return
 
-    frames = []
-    frame_count = 120  # Number of frames for the GIF
-    fps = 30  # Frame rate for the GIF
+        frames = []
+        frame_count = 120  # Number of frames for the GIF
+        fps = 30  # Frame rate for the GIF
 
-    for _ in range(frame_count):
-        ret, frame = cap.read()
-        if not ret:
-            break
+        for _ in range(frame_count):
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-        # Convert frame (OpenCV uses BGR, while GIFs need RGB)
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frames.append(frame_rgb)
+            # Convert frame (OpenCV uses BGR, while GIFs need RGB)
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frames.append(frame_rgb)
 
-        # Wait a bit between frame captures
-        await asyncio.sleep(1 / fps)
+            # Wait a bit between frame captures
+            await asyncio.sleep(1 / fps)
 
-    cap.release()
+        cap.release()
 
-    # Create the GIF
-    gif_path = "webcam_output.gif"
-    imageio.mimsave(gif_path, frames, format="GIF", fps=fps)
+        # Create the GIF
+        gif_path = "webcam_output.gif"
+        imageio.mimsave(gif_path, frames, format="GIF", fps=fps)
 
-    # Send the GIF to Discord
-    await channel.send(file=discord.File(gif_path))
+        # Send the GIF to Discord
+        await channel.send(file=discord.File(gif_path))
 
-    # Clean up
-    os.remove(gif_path)
+        # Clean up
+        os.remove(gif_path)
+    except Exception as e:
+        await channel.send("Cat does not consent to being downloaded, please try again never.")
 
 
 bot.run(config.BOT_TOKEN)
